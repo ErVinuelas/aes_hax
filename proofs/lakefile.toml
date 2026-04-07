@@ -1,0 +1,16 @@
+name = "libcrux_aesgcm"
+version = "0.1.0"
+defaultTargets = ["libcrux-aesgcm"]
+
+[[lean_lib]]
+name = "libcrux-aesgcm"
+
+[[require]]
+name = "Hax"
+git.url = "https://github.com/cryspen/hax"
+git.subDir = "hax-lib/proof-libs/lean"
+rev = "main"
+
+[[require]]
+name = "mathlib"
+scope = "leanprover-community"
