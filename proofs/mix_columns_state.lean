@@ -5,6 +5,7 @@ import Hax
 import Std.Tactic.Do
 import Std.Do.Triple
 import Std.Tactic.Do.Syntax
+import Utilities
 
 open Std.Do
 open Std.Tactic
@@ -61,5 +62,37 @@ def mix_columns_state (st : (RustArray u16 8)) : RustM (RustArray u16 8) := do
       (4 : usize)
       (← ((← st[(4 : usize)]_?) ^^^? last_col)));
   (pure st)
+
+def mix_columns_state_spec (st : Vector u16 8) : Vector u16 8 :=
+  (4 : Nat).fold (init := zero_array) fun group_indx _ res =>
+  let s_0 := get_elem st group_indx (by omega)
+  let s_1 := get_elem st (group_indx + 4) (by omega)
+  let s_2 := get_elem st (group_indx + 8) (by omega)
+  let s_3 := get_elem st (group_indx + 12) (by omega)
+
+  let s_0' := (0x02#8 &&& s_0) ^^^ (0x03#8 &&& s_1) ^^^ s_2 ^^^ s_3
+  let s_1' := (0x02#8 &&& s_1) ^^^ (0x03#8 &&& s_2) ^^^ s_3 ^^^ s_0
+  let s_2' := (0x02#8 &&& s_2) ^^^ (0x03#8 &&& s_3) ^^^ s_0 ^^^ s_1
+  let s_3' := (0x02#8 &&& s_3) ^^^ (0x03#8 &&& s_0) ^^^ s_1 ^^^ s_2
+
+  let set_0 := set_elem res group_indx s_0'
+  let set_1 := set_elem set_0 (group_indx + 4) s_1'
+  let set_2 := set_elem set_1 (group_indx + 8) s_2'
+  set_elem set_2 (group_indx + 12) s_3'
+
+set_option maxHeartbeats 100000000
+set_option hax_mvcgen.specset "bv" in
+theorem transpose_u16x8_correct (st : (Vector u16 8)) :
+⦃ ⌜ true = true ⌝ ⦄
+mix_columns_state (RustArray.ofVec zero_array)
+⦃ ⇓ ⟨res⟩ =>
+    ⌜ res[0] = (mix_columns_state_spec zero_array)[0] ⌝ ⦄
+:= by
+    unfold mix_columns_state
+    hax_mvcgen <;> simp at *
+    rename_auto_n 14
+    unfold mix_columns_state_spec set_elem get_elem zero_array
+    simp
+    sorry
 
 end aes_core.mix_columns_state

@@ -131,16 +131,13 @@ def interleave_u16_8_spec (i0 : u16) (i1 : u16) : (u16 × u16) :=
   let i0_btv := i0.toBitVec
   let i1_btv := i1.toBitVec
 
-  -- Extract Low Bytes (0-7) and High Bytes (8-15)
   let i0_low  := i0_btv.extractLsb 7 0
   let i0_high := i0_btv.extractLsb 15 8
   let i1_low  := i1_btv.extractLsb 7 0
   let i1_high := i1_btv.extractLsb 15 8
 
-  -- x = (i1_low << 8) | i0_low
   let x := (i1_low.zeroExtend 16 <<< 8) ||| (i0_low.zeroExtend 16)
 
-  -- y = (i0_high >> 8) | i1_high  (Note: your code shifts i0_high right, then ORs with i1_high)
   let y := (i0_high.zeroExtend 16) ||| (i1_high.zeroExtend 16 <<< 8)
 
   ((UInt16.ofBitVec x), (UInt16.ofBitVec y))
@@ -272,8 +269,5 @@ def transposeU16toU8 (input : RustArray u16 8) : RustArray u8 16 :=
   RustArray.ofVec <| Vector.ofFn fun (bt_num : Fin 16) =>
     (8 : Nat).fold (init := (0 : u8)) fun mtx_elem_num _ bt_plane =>
       UInt8.ofBitVec (bt_plane.toBitVec ||| (((input.toVec[mtx_elem_num].toBitVec >>> bt_num.val) &&& 1).setWidth 8 <<< mtx_elem_num))
-
-
-
 
 end aes_core.transpose_u16x8
