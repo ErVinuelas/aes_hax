@@ -6,6 +6,8 @@ import Utilities
 import transpose_u16x8
 import transpose_u8x16
 import shift_rows_state
+import xor_key1_state
+import sub_bytes
 
 open Std.Do
 open Std.Tactic
@@ -56,7 +58,7 @@ aes_core.transpose_u16x8.transpose_u16x8 input output
 
           simp only [<- var_3, <- var_6, <- var_8, <- var_11, <- var_13, <- var_16, <- var_18, <- var_44]
 
-          bv_check "LibcruxAesgcm.lean-aes_core.transpose_u16x8_correct-59-10.lrat"
+          bv_check "./sat_proofs/LibcruxAesgcm.lean-aes_core.transpose_u16x8_correct-59-10.lrat"
     all_goals try omega
     grind
 
@@ -92,7 +94,7 @@ aes_core.transpose_u8x16.transpose_u8x16 input output
             <- var_17, <- var_20, <- var_22, <- var_25, <- var_27, <- var_30,
             <- var_32, <- var_35, <- var_37]
 
-          bv_check "LibcruxAesgcm.lean-aes_core.transpose_u8x16_correct-96-10.lrat"
+          bv_check "./sat_proofs/LibcruxAesgcm.lean-aes_core.transpose_u8x16_correct-96-10.lrat"
 
     all_goals grind
 
@@ -123,5 +125,54 @@ aes_core.shift_row_state.shift_rows_state st
         simp only [<- var_39, <- var_37, <- var_35, <- var_33, <- var_31, <- var_29, <- var_27, <- var_25]
     all_goals grind
 
+set_option maxHeartbeats 100000000
+set_option hax_mvcgen.specset "bv" in
+@[spec]
+theorem xor_key1_state_correct (st : (RustArray u16 8))(k : (RustArray u16 8)) :
+⦃ ⌜ true = true ⌝ ⦄
+aes_core.xor_key1_state.xor_key1_state st k
+⦃ ⇓ ⟨res⟩ =>
+    ⌜ res = (aes_core.xor_key1_state.xor_key1_state_spec st.toVec k.toVec) ⌝ ⦄
+:= by
+    unfold aes_core.xor_key1_state.xor_key1_state
+
+    hax_mvcgen
+    <;> simp at *
+    .
+      unfold aes_core.xor_key1_state.xor_key1_state_spec
+      simp
+      rename_auto_n 41
+      ext i
+      match i with
+      | n + 8 => omega
+      | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 =>
+        simp
+        simp only [<- var_29, <- var_5, <- var_9, <- var_13, <- var_17, <- var_21, <- var_25, <- var_32, <- var_33, <- var_34, <- var_35, <- var_36, <- var_37, <- var_38, <- var_39, <- var_40]
+
+    all_goals grind
+
+set_option maxHeartbeats 10000000000000
+set_option maxRecDepth 100000
+theorem sub_bytes_correct (st : RustArray u16 8) (a : BitVec 8) (n : BitVec 4) :
+⦃ ⌜ a = get_elem_bv st.toVec n ⌝ ⦄
+aes_core.sub_bytes.sub_bytes_state st
+⦃ ⇓ ⟨res_output⟩ =>
+    ⌜ aes_core.sub_bytes.get_elem_SBOX (a.extractLsb 7 4) (a.extractLsb 3 0) = get_elem_bv res_output n  ⌝ ⦄
+:= by
+
+  unfold aes_core.sub_bytes.sub_bytes_state
+  hax_mvcgen <;> simp at *
+  .
+    rename_auto_n 45
+
+    simp only [var_0]
+    simp only [get_elem_bv, aes_core.sub_bytes.get_elem_SBOX]
+    simp only [Nat.reduceAdd, Nat.sub_zero, beq_iff_eq, BitVec.ushiftRight_eq', BitVec.zero_or,
+      ne_eq, reduceCtorEq, not_false_eq_true, Vector.getElem_set_ne, Nat.succ_ne_self,
+      Vector.getElem_set_self, UInt16.toBitVec_not, UInt16.toBitVec_xor, UInt16.toBitVec_and,
+      Nat.reduceEqDiff]
+    simp only [<- var_24, <- var_2, <- var_4, <- var_6, <- var_8, <- var_10, <- var_12, <- var_14 ]
+    bv_check "./sat_proofs/sub_bytes_per_bit.lean-aes_core.sub_bytes.sub_bytes_correct-650-4.lrat"
+  all_goals grind
 
 end aes_core
