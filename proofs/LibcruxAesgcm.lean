@@ -8,6 +8,7 @@ import transpose_u8x16
 import shift_rows_state
 import xor_key1_state
 import sub_bytes
+import mix_columns
 
 open Std.Do
 open Std.Tactic
@@ -174,5 +175,50 @@ aes_core.sub_bytes.sub_bytes_state st
     simp only [<- var_24, <- var_2, <- var_4, <- var_6, <- var_8, <- var_10, <- var_12, <- var_14 ]
     bv_check "./sat_proofs/sub_bytes_per_bit.lean-aes_core.sub_bytes.sub_bytes_correct-650-4.lrat"
   all_goals grind
+
+
+set_option maxHeartbeats 100000000
+set_option maxRecDepth 10000
+set_option hax_mvcgen.specset "bv" in
+@[spec]
+theorem mix_columns_state_correct (st : RustArray u16 8) :
+⦃ ⌜ true = true ⌝ ⦄
+aes_core.mix_columns.mix_columns_state_unrolled st
+⦃ ⇓ ⟨res⟩ =>
+    ⌜ res = aes_core.mix_columns.mix_columns_state_spec st.toVec ⌝ ⦄
+:= by
+    unfold aes_core.mix_columns.mix_columns_state_unrolled
+
+    hax_mvcgen
+    <;> simp at *
+    .
+      ext i
+      match i with
+      | n + 8 => grind
+      | 0 | 1 | 2 | 3 | 4| 5 | 6 | 7 =>
+        unfold aes_core.mix_columns.mix_columns_state_spec
+        rename_auto_n 180
+        simp only [ne_eq, reduceCtorEq, not_false_eq_true, Vector.getElem_set_ne, Nat.succ_ne_self,
+          Vector.getElem_set_self, BitVec.natCast_eq_ofNat, Nat.reduceSubDiff, Nat.fold_succ,
+          Nat.fold_zero, Nat.zero_mul, Nat.sub_zero, Nat.one_mul, Nat.reduceMul,
+          Nat.sub_self]
+        simp only [set_elem_bv, get_elem_bv, zero_array]
+        simp only [ne_eq, Nat.reduceEqDiff, not_false_eq_true, Vector.getElem_set_ne, reduceCtorEq,
+          Vector.getElem_set_self, Nat.sub_zero, Nat.reduceAdd, BitVec.zero_eq,
+          UInt16.ofBitVec_ofNat, Vector.getElem_replicate, UInt16.toBitVec_ofNat, BitVec.reduceBEq,
+          Bool.false_eq_true, ↓reduceIte, BitVec.shiftLeft_eq', BitVec.toNat_ofNat, Nat.reducePow,
+          Nat.zero_mod, BitVec.shiftLeft_zero, BitVec.reduceNot, BitVec.zero_and,
+          BitVec.ushiftRight_eq', BitVec.ushiftRight_zero, BitVec.zero_or, BEq.rfl, Nat.one_mod,
+          Nat.reduceMod, Vector.getElem_mk, List.getElem_toArray, List.getElem_cons_zero,
+          UInt16.toBitVec_ofBitVec, BitVec.reduceHShiftLeft, UInt16.ofBitVec_or,
+          UInt16.ofBitVec_and, Nat.reduceLT, UInt16.ofBitVec_shiftLeft, UInt16.ofNat_one,
+          List.getElem_cons_succ, UInt16.toBitVec_or, UInt16.toBitVec_and,
+          UInt16.toBitVec_shiftLeft, BitVec.ofNat_eq_ofNat, BitVec.reduceMod, UInt16.reduceOfNat,
+          Nat.lt_add_one]
+        simp only [GF8.add, GF8.mul_02_eq_xtime_bv, GF8.mul_03_eq_mul3_bv, GF8.mul3_bv, GF8.xtime_bv]
+        rw_vars 81 to 148
+        simp only [<- var_81, <- var_89, <- var_97, <- var_105, <- var_113, <- var_121, <- var_129, <- var_137 ]
+        bv_decide
+    all_goals grind
 
 end aes_core

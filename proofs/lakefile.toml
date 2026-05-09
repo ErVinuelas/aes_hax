@@ -5,7 +5,7 @@ defaultTargets = ["LibcruxAesgcm"]
 [[lean_lib]]
 name = "LibcruxAesgcm"
 srcDir = "."     
-globs = ["LibcruxAesgcm", "Utilities", "shift_rows_state", "sub_bytes", "transpose_u16x8", "xor_key1_state", "transpose_u8x16", "gf128", "gf8_lsb", "sub_bytes"]
+globs = ["LibcruxAesgcm", "Utilities", "shift_rows_state", "sub_bytes", "transpose_u16x8", "xor_key1_state", "transpose_u8x16", "gf128", "gf8", "sub_bytes", "mix_columns"]
 
 [[require]]
 name = "Hax"

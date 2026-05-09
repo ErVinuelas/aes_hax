@@ -34,6 +34,23 @@ def evalRenameAutoN : Tactic := fun stx => do
 
 --Some functions to work with how the AES matrix is represented.
 
+--Macro to be able to rewrite variables automatically
+elab "rw_vars" lo:num "to" hi:num : tactic =>
+  withMainContext do
+    let lctx ← MonadLCtx.getLCtx
+    for i in List.range (hi.getNat - lo.getNat + 1) do
+      let n := lo.getNat + i
+      let hypName : Name := .str .anonymous s!"var_{n}"
+      let decl? := lctx.findDecl? fun decl =>
+        if decl.userName == hypName then some decl else none
+      if let some decl := decl? then
+        try
+          liftMetaTactic fun mvarId => do
+            let result ← mvarId.rewrite (← mvarId.getDecl).type decl.toExpr
+            let newGoal ← mvarId.replaceTargetEq result.eNew result.eqProof
+            return [newGoal]
+        catch _ => pure ()
+
 def zero_array : Vector u16 8 :=
   Vector.replicate 8 (UInt16.ofBitVec <| BitVec.zero 16)
 
