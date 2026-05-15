@@ -66,30 +66,8 @@ def some_array : RustArray u16 8 :=
     0b0000000000000000])
 
 -- Get an element from the bit map
-def get_elem (st : Vector u16 8) (elem_indx : Nat) (h : elem_indx < 16) : BitVec 8 :=
-  (8 : Nat).fold (init := 0) fun bt_indx _ elem =>
-    let elem_indx_fin := elem_indx
-    let elem_bt_indx := (st[bt_indx].toBitVec >>> (elem_indx_fin) &&& 1).setWidth 8
-    elem ||| (elem_bt_indx <<< bt_indx : BitVec 8)
-
 def get_elem_bv (st : Vector u16 8) (elem_indx : BitVec 4) : BitVec 8 :=
-  let shift : BitVec 16 :=
-    if elem_indx == 0#4  then 15#16
-    else if elem_indx == 1#4  then 14#16
-    else if elem_indx == 2#4  then 13#16
-    else if elem_indx == 3#4  then 12#16
-    else if elem_indx == 4#4  then 11#16
-    else if elem_indx == 5#4  then 10#16
-    else if elem_indx == 6#4  then  9#16
-    else if elem_indx == 7#4  then  8#16
-    else if elem_indx == 8#4  then  7#16
-    else if elem_indx == 9#4  then  6#16
-    else if elem_indx == 10#4 then  5#16
-    else if elem_indx == 11#4 then  4#16
-    else if elem_indx == 12#4 then  3#16
-    else if elem_indx == 13#4 then  2#16
-    else if elem_indx == 14#4 then  1#16
-    else                           0#16
+  let shift : BitVec 16 := elem_indx.zeroExtend 16
   let b0 := ((st[0].toBitVec >>> shift) &&& 1#16).extractLsb 0 0
   let b1 := ((st[1].toBitVec >>> shift) &&& 1#16).extractLsb 0 0
   let b2 := ((st[2].toBitVec >>> shift) &&& 1#16).extractLsb 0 0
@@ -109,32 +87,8 @@ def get_elem_bv (st : Vector u16 8) (elem_indx : BitVec 4) : BitVec 8 :=
     ||| (0#1 ++ b6 ++ 0#6)
     ||| (b7 ++ 0#7))
 
-def set_elem (st : Vector u16 8) (elem_indx : Nat) (new_elem : BitVec 8) : (Vector u16 8) :=
-  (8 : Nat).fold (init := zero_array) fun bt_indx _ acc =>
-    let map_bit := st[bt_indx].toBitVec
-    let bt := BitVec.zeroExtend 16 ((new_elem >>> bt_indx) &&& 1)
-    let clear_map := (map_bit &&& ~~~((1 : BitVec 16) <<< elem_indx))
-    let new_map := clear_map ||| (bt <<< elem_indx)
-    (Vector.set acc bt_indx (UInt16.ofBitVec new_map))
-
 def set_elem_bv (st : Vector u16 8) (elem_indx : BitVec 4) (new_elem : BitVec 8) : Vector u16 8 :=
-  let shift : BitVec 16 :=
-    if elem_indx == 0#4  then 15#16
-    else if elem_indx == 1#4  then 14#16
-    else if elem_indx == 2#4  then 13#16
-    else if elem_indx == 3#4  then 12#16
-    else if elem_indx == 4#4  then 11#16
-    else if elem_indx == 5#4  then 10#16
-    else if elem_indx == 6#4  then  9#16
-    else if elem_indx == 7#4  then  8#16
-    else if elem_indx == 8#4  then  7#16
-    else if elem_indx == 9#4  then  6#16
-    else if elem_indx == 10#4 then  5#16
-    else if elem_indx == 11#4 then  4#16
-    else if elem_indx == 12#4 then  3#16
-    else if elem_indx == 13#4 then  2#16
-    else if elem_indx == 14#4 then  1#16
-    else                           0#16
+  let shift : BitVec 16 := elem_indx.zeroExtend 16
   let mask : BitVec 16 := 1#16 <<< shift
   let bt0 := (0#15 ++ (new_elem &&& 0x01#8).extractLsb 0 0) <<< shift
   let bt1 := (0#15 ++ ((new_elem >>> 1#8) &&& 0x01#8).extractLsb 0 0) <<< shift
@@ -154,14 +108,3 @@ def set_elem_bv (st : Vector u16 8) (elem_indx : BitVec 4) (new_elem : BitVec 8)
   let new7 := (st[7].toBitVec &&& ~~~mask) ||| bt7
   #v[UInt16.ofBitVec new0, UInt16.ofBitVec new1, UInt16.ofBitVec new2, UInt16.ofBitVec new3,
      UInt16.ofBitVec new4, UInt16.ofBitVec new5, UInt16.ofBitVec new6, UInt16.ofBitVec new7]
-
-set_option maxRecDepth 100000
-theorem set_elem_th_3 (el : Nat) (h : el < 16) (new : BitVec 8) :
-  let vec_set := (set_elem zero_array el new)
-  get_elem vec_set el h = new := by
-  unfold get_elem set_elem zero_array
-  simp
-  match el with
-  | n + 16 => omega
-  | 0 | 1 | 2 | 3 | 4| 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 =>
-    bv_decide
