@@ -5,6 +5,7 @@ import Hax
 import Std.Tactic.Do
 import Std.Do.Triple
 import Std.Tactic.Do.Syntax
+import Utilities
 
 open Std.Do
 open Std.Tactic
@@ -269,5 +270,27 @@ def transposeU16toU8 (input : RustArray u16 8) : RustArray u8 16 :=
   RustArray.ofVec <| Vector.ofFn fun (bt_num : Fin 16) =>
     (8 : Nat).fold (init := (0 : u8)) fun mtx_elem_num _ bt_plane =>
       UInt8.ofBitVec (bt_plane.toBitVec ||| (((input.toVec[mtx_elem_num].toBitVec >>> bt_num.val) &&& 1).setWidth 8 <<< mtx_elem_num))
+
+--Theorem to ensure that we can obtain the same elements from the input
+set_option maxHeartbeats 10000000
+theorem transpose_correct (input : (RustArray u16 8)) (i : Nat) (hi : i < 16) :
+  get_elem_bv input.toVec (BitVec.ofFin ⟨i, hi⟩) = (transposeU16toU8 input).toVec[i].toBitVec := by
+  simp
+  match i with
+  | n + 16 => grind
+  | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 =>
+
+    simp only [get_elem_bv, transposeU16toU8]
+    simp
+    generalize h0 : @getElem (Vector u16 8) Nat u16 (fun x i => i < 8) Vector.instGetElemNatLt input.toVec 0 _ = var_0
+    generalize h1 : @getElem (Vector u16 8) Nat u16 (fun x i => i < 8) Vector.instGetElemNatLt input.toVec 1 _ = var_1
+    generalize h2 : @getElem (Vector u16 8) Nat u16 (fun x i => i < 8) Vector.instGetElemNatLt input.toVec 2 _ = var_2
+    generalize h3 : @getElem (Vector u16 8) Nat u16 (fun x i => i < 8) Vector.instGetElemNatLt input.toVec 3 _ = var_3
+    generalize h4 : @getElem (Vector u16 8) Nat u16 (fun x i => i < 8) Vector.instGetElemNatLt input.toVec 4 _ = var_4
+    generalize h5 : @getElem (Vector u16 8) Nat u16 (fun x i => i < 8) Vector.instGetElemNatLt input.toVec 5 _ = var_5
+    generalize h6 : @getElem (Vector u16 8) Nat u16 (fun x i => i < 8) Vector.instGetElemNatLt input.toVec 6 _ = var_6
+    generalize h7 : @getElem (Vector u16 8) Nat u16 (fun x i => i < 8) Vector.instGetElemNatLt input.toVec 7 _ = var_7
+    bv_decide
+
 
 end aes_core.transpose_u16x8
