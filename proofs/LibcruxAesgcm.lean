@@ -19,9 +19,9 @@ set_option linter.unusedVariables false
 namespace aes_core
 
 --Here are the most important lemmas and the proofs associated with them
-
 set_option maxHeartbeats 100000000
 set_option hax_mvcgen.specset "bv" in
+@[spec]
 theorem transpose_u16x8_correct (input : (RustArray u16 8)) (output : (RustSlice u8)) :
 ⦃ ⌜ output.val.size = 16 ⌝ ⦄
 aes_core.transpose_u16x8.transpose_u16x8 input output
@@ -154,7 +154,7 @@ aes_core.xor_key1_state.xor_key1_state st k
 
 set_option maxHeartbeats 10000000000000
 set_option maxRecDepth 100000
-theorem sub_bytes_correct (st : RustArray u16 8) (a : BitVec 8) (n : BitVec 4) :
+theorem sub_bytes_correct (n : BitVec 4) (a : BitVec 8) (st : RustArray u16 8) :
 ⦃ ⌜ a = get_elem_bv st.toVec n ⌝ ⦄
 aes_core.sub_bytes.sub_bytes_state st
 ⦃ ⇓ ⟨res_output⟩ =>

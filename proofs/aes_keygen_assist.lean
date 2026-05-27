@@ -6,7 +6,7 @@ import Std.Tactic.Do
 import Std.Do.Triple
 import Std.Tactic.Do.Syntax
 import sub_bytes
-import key_expansion
+import key_expansion_step
 import Utilities
 open Std.Do
 open Std.Tactic
@@ -15,7 +15,7 @@ set_option mvcgen.warning false
 set_option linter.unusedVariables false
 
 
-namespace libcrux_aesgcm.platform.portable.aes_core
+namespace aes_core.aes_keygen
 
 @[spec]
 def aes_keygen_assisti (rcon : u8) (i : usize) (u : u16) : RustM u16 := do
@@ -342,4 +342,4 @@ by
     all_goals grind
 
 
-end libcrux_aesgcm.platform.portable.aes_core
+end aes_core.aes_keygen

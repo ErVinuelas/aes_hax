@@ -108,3 +108,17 @@ def set_elem_bv (st : Vector u16 8) (elem_indx : BitVec 4) (new_elem : BitVec 8)
   let new7 := (st[7].toBitVec &&& ~~~mask) ||| bt7
   #v[UInt16.ofBitVec new0, UInt16.ofBitVec new1, UInt16.ofBitVec new2, UInt16.ofBitVec new3,
      UInt16.ofBitVec new4, UInt16.ofBitVec new5, UInt16.ofBitVec new6, UInt16.ofBitVec new7]
+
+def get_word (st : Vector u16 8) (index : BitVec 4) : Vector (BitVec 8) 4 :=
+  #v[
+    get_elem_bv st (4 * index + 3), get_elem_bv st (4 * index + 2),
+    get_elem_bv st (4 * index + 1), get_elem_bv st (4 * index + 0)
+  ]
+
+def xor_word (a b : Vector (BitVec 8) 4) : Vector (BitVec 8) 4 :=
+  Vector.map
+    (fun (p : BitVec 8 × BitVec 8) => p.1 ^^^ p.2) (Vector.zip a b)
+
+
+def hex16 (v : BitVec 16) : String :=
+  s!"0x{v.toHex}"

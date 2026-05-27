@@ -421,4 +421,50 @@ def sub_bytes_state (st : (RustArray u16 8)) : RustM (RustArray u16 8) := do
       s0);
   (pure st)
 
+def get_aes_st (st : Vector u16 8) : Vector (BitVec 8) 4 :=
+  #v[
+    get_elem_bv st 15,
+    get_elem_bv st 14,
+    get_elem_bv st 13,
+    get_elem_bv st 12
+  ]
+
+#check aes_core.sub_bytes.get_elem_SBOX
+
+def apply_sbox_st (old : Vector (BitVec 8) 4) : Vector (BitVec 8) 4 :=
+  Vector.map (fun a => aes_core.sub_bytes.get_elem_SBOX (a.extractLsb 7 4) (a.extractLsb 3 0)) old
+--Write it better
+set_option maxHeartbeats 10000000000000
+set_option maxRecDepth 100000
+theorem sub_bytes_correct_chunk (a0 a1 a2 a3 : BitVec 8) (st : RustArray u16 8) :
+⦃ ⌜
+  a0 = get_elem_bv st.toVec 15#4 /\ a1 = get_elem_bv st.toVec 14#4 /\
+  a2 = get_elem_bv st.toVec 13#4 /\ a3 = get_elem_bv st.toVec 12#4
+⌝ ⦄
+aes_core.sub_bytes.sub_bytes_state st
+⦃ ⇓ ⟨res_output⟩ =>
+    ⌜
+    aes_core.sub_bytes.get_elem_SBOX (a0.extractLsb 7 4) (a0.extractLsb 3 0) = get_elem_bv res_output 15#4 /\
+    aes_core.sub_bytes.get_elem_SBOX (a1.extractLsb 7 4) (a1.extractLsb 3 0) = get_elem_bv res_output 14#4 /\
+    aes_core.sub_bytes.get_elem_SBOX (a2.extractLsb 7 4) (a2.extractLsb 3 0) = get_elem_bv res_output 13#4 /\
+    aes_core.sub_bytes.get_elem_SBOX (a3.extractLsb 7 4) (a3.extractLsb 3 0) = get_elem_bv res_output 12#4
+⌝ ⦄
+:= by
+
+  unfold aes_core.sub_bytes.sub_bytes_state
+  hax_mvcgen <;> simp at *
+  .
+    rename_auto_n 45
+
+    simp only [var_0]
+    refine ⟨?_, ?_, ?_, ?_⟩ <;>
+    simp only [get_elem_bv, aes_core.sub_bytes.get_elem_SBOX] <;>
+    simp only [Nat.reduceAdd, Nat.sub_zero, beq_iff_eq, BitVec.ushiftRight_eq', BitVec.zero_or,
+      ne_eq, reduceCtorEq, not_false_eq_true, Vector.getElem_set_ne, Nat.succ_ne_self,
+      Vector.getElem_set_self, UInt16.toBitVec_not, UInt16.toBitVec_xor, UInt16.toBitVec_and,
+      Nat.reduceEqDiff] <;>
+    simp only [<- var_24, <- var_2, <- var_4, <- var_6, <- var_8, <- var_10, <- var_12, <- var_14 ] <;>
+    bv_decide
+  all_goals grind
+
 end aes_core.sub_bytes
