@@ -54,19 +54,8 @@ elab "rw_vars" lo:num "to" hi:num : tactic =>
 def zero_array : Vector u16 8 :=
   Vector.replicate 8 (UInt16.ofBitVec <| BitVec.zero 16)
 
-def some_array : RustArray u16 8 :=
-  RustArray.ofVec (#v[
-    0b1000000000000000,
-    0b0000000000000000,
-    0b0000000000000000,
-    0b0000000000000000,
-    0b0000000000000000,
-    0b0000000000000000,
-    0b1000000000000000,
-    0b0000000000000000])
-
 -- Get an element from the bit map
-def get_elem_bv (st : Vector u16 8) (elem_indx : BitVec 4) : BitVec 8 :=
+def get_elem (st : Vector u16 8) (elem_indx : BitVec 4) : BitVec 8 :=
   let shift : BitVec 16 := elem_indx.zeroExtend 16
   let b0 := ((st[0].toBitVec >>> shift) &&& 1#16).extractLsb 0 0
   let b1 := ((st[1].toBitVec >>> shift) &&& 1#16).extractLsb 0 0
@@ -87,7 +76,7 @@ def get_elem_bv (st : Vector u16 8) (elem_indx : BitVec 4) : BitVec 8 :=
     ||| (0#1 ++ b6 ++ 0#6)
     ||| (b7 ++ 0#7))
 
-def set_elem_bv (st : Vector u16 8) (elem_indx : BitVec 4) (new_elem : BitVec 8) : Vector u16 8 :=
+def set_elem (st : Vector u16 8) (elem_indx : BitVec 4) (new_elem : BitVec 8) : Vector u16 8 :=
   let shift : BitVec 16 := elem_indx.zeroExtend 16
   let mask : BitVec 16 := 1#16 <<< shift
   let bt0 := (0#15 ++ (new_elem &&& 0x01#8).extractLsb 0 0) <<< shift
@@ -111,8 +100,8 @@ def set_elem_bv (st : Vector u16 8) (elem_indx : BitVec 4) (new_elem : BitVec 8)
 
 def get_word (st : Vector u16 8) (index : BitVec 4) : Vector (BitVec 8) 4 :=
   #v[
-    get_elem_bv st (4 * index + 3), get_elem_bv st (4 * index + 2),
-    get_elem_bv st (4 * index + 1), get_elem_bv st (4 * index + 0)
+    get_elem st (4 * index + 3), get_elem st (4 * index + 2),
+    get_elem st (4 * index + 1), get_elem st (4 * index + 0)
   ]
 
 def xor_word (a b : Vector (BitVec 8) 4) : Vector (BitVec 8) 4 :=

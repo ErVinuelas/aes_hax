@@ -3,12 +3,29 @@ version = "0.1.0"
 defaultTargets = ["LibcruxAesgcm"]
 
 [[lean_lib]]
+name = "Utilities"
+srcDir = "."
+globs = ["Utilities"]
+
+[[lean_lib]]
+name = "Cipher"
+srcDir = "cipher"
+globs = ["Cipher", "transpose_u16x8", "transpose_u8x16", "sub_bytes",
+         "shift_rows_state", "xor_key1_state", "mix_columns",
+         "gf8", "cipher_theorems"]
+needs = ["Utilities"]
+
+[[lean_lib]]
+name = "KeyExpansion"
+srcDir = "key_expansion"
+globs = [ "KeyExpansion", "key_expansion_step", "aes_keygen_assist", "key_expansion"]
+needs = ["Utilities", "Cipher"]
+
+[[lean_lib]]
 name = "LibcruxAesgcm"
-srcDir = "."     
-globs = [
-        "LibcruxAesgcm", "Utilities", "shift_rows_state", "sub_bytes",
-        "transpose_u16x8", "xor_key1_state", "transpose_u8x16", "gf128", "gf8",
-        "sub_bytes", "mix_columns", "key_expansion_step", "aes_keygen_assist"]
+srcDir = "."
+globs = ["LibcruxAesgcm"]
+needs = ["Cipher", "KeyExpansion"]
 
 [[require]]
 name = "Hax"

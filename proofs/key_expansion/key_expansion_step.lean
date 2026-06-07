@@ -6,6 +6,7 @@ import Std.Tactic.Do
 import Std.Do.Triple
 import Std.Tactic.Do.Syntax
 import Utilities
+
 open Std.Do
 open Std.Tactic
 
@@ -112,7 +113,7 @@ theorem key_expansion_correct2 (next : (RustArray u16 8)) (prev : (RustArray u16
   by
     unfold key_expansion_step
     hax_mvcgen[key_expand1_correct] <;> simp at *
-    unfold get_word get_elem_bv xor_word
+    unfold get_word get_elem xor_word
     .
       intros
       simp only [Nat.sub_zero, Nat.reduceAdd, ne_eq, reduceCtorEq, not_false_eq_true,

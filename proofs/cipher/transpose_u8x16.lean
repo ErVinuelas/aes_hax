@@ -153,8 +153,8 @@ def transpose_u8x16 (input : (RustArray u8 16)) (output : (RustArray u16 8)) :
       o7);
   (pure output)
 
-def transposeU8toU16 (input : RustArray u8 16) : RustArray u16 8 :=
-  RustArray.ofVec <| Vector.ofFn fun (bt_num : Fin 8) =>
+def transposeU8toU16 (input : RustArray u8 16) : Vector u16 8 :=
+  Vector.ofFn fun (bt_num : Fin 8) =>
     (16 : Nat).fold (init := (0 : u16)) fun mtx_elem_num _ bt_plane =>
       UInt16.ofBitVec (bt_plane.toBitVec ||| (((input.toVec[mtx_elem_num].toBitVec >>> bt_num.val) &&& 1).setWidth 16 <<< mtx_elem_num))
 
@@ -163,13 +163,13 @@ def transposeU8toU16 (input : RustArray u8 16) : RustArray u16 8 :=
 --Theorem to ensure that we can obtain the same elements from the input
 set_option maxHeartbeats 10000000
 theorem transpose_correct (input : (RustArray u8 16)) (i : Nat) (hi : i < 16) :
-  get_elem_bv (transposeU8toU16 input).toVec (BitVec.ofFin ⟨i, hi⟩) = input.toVec[i].toBitVec := by
+  get_elem (transposeU8toU16 input) (BitVec.ofFin ⟨i, hi⟩) = input.toVec[i].toBitVec := by
   simp
   match i with
   | n + 16 => grind
   | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 =>
 
-    simp only [get_elem_bv, transposeU8toU16]
+    simp only [get_elem, transposeU8toU16]
     simp
     generalize h0 : @getElem (Vector u8 16) Nat u8 (fun x i => i < 16) Vector.instGetElemNatLt input.toVec 0 _ = var_0
     generalize h1 : @getElem (Vector u8 16) Nat u8 (fun x i => i < 16) Vector.instGetElemNatLt input.toVec 1 _ = var_1

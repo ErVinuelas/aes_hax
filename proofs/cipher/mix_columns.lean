@@ -198,20 +198,20 @@ def mix_columns_state_unrolled (__st__ : (RustArray u16 8)) :
 def mix_columns_state_spec (st : Vector u16 8) : Vector u16 8 :=
   (4 : Nat).fold (init := zero_array) fun group_indx _ res =>
   let index := group_indx * 4
-  let s_0 := get_elem_bv st index
-  let s_1 := get_elem_bv st (index + 1)
-  let s_2 := get_elem_bv st (index + 2)
-  let s_3 := get_elem_bv st (index + 3)
+  let s_0 := get_elem st index
+  let s_1 := get_elem st (index + 1)
+  let s_2 := get_elem st (index + 2)
+  let s_3 := get_elem st (index + 3)
 
   let s_0' := GF8.add (GF8.add (GF8.add (GF8.mul (0x02#8) s_0) (GF8.mul (0x03#8) s_1)) s_2) s_3
   let s_1' := GF8.add (GF8.add (GF8.add (GF8.mul (0x02#8) s_1) (GF8.mul (0x03#8) s_2)) s_3) s_0
   let s_2' := GF8.add (GF8.add (GF8.add (GF8.mul (0x02#8) s_2) (GF8.mul (0x03#8) s_3)) s_0) s_1
   let s_3' := GF8.add (GF8.add (GF8.add (GF8.mul (0x02#8) s_3) (GF8.mul (0x03#8) s_0)) s_1) s_2
 
-  let set_0 := set_elem_bv res index s_0'
-  let set_1 := set_elem_bv set_0 (index + 1) s_1'
-  let set_2 := set_elem_bv set_1 (index + 2) s_2'
-  set_elem_bv set_2 (index + 3) s_3'
+  let set_0 := set_elem res index s_0'
+  let set_1 := set_elem set_0 (index + 1) s_1'
+  let set_2 := set_elem set_1 (index + 2) s_2'
+  set_elem set_2 (index + 3) s_3'
 
 
 -- ============================================================

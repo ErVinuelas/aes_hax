@@ -6,6 +6,7 @@ import Std.Tactic.Do
 import Std.Do.Triple
 import Std.Tactic.Do.Syntax
 import Utilities
+
 open Std.Do
 open Std.Tactic
 

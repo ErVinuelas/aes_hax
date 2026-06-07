@@ -191,53 +191,53 @@ def sub_bytes_state_spec (st : Vector u16 8) : Vector u16 8 :=
     let col := v.extractLsb 3 0
     get_elem_SBOX row col
   -- Element 0
-  let e0  := get_elem_bv st 0#4
-  let st' := set_elem_bv (Vector.replicate 8 0) 0#4  (apply_sbox e0)
+  let e0  := get_elem st 0#4
+  let st' := set_elem (Vector.replicate 8 0) 0#4  (apply_sbox e0)
   -- Element 1
-  let e1  := get_elem_bv st 1#4
-  let st' := set_elem_bv st' 1#4  (apply_sbox e1)
+  let e1  := get_elem st 1#4
+  let st' := set_elem st' 1#4  (apply_sbox e1)
   -- Element 2
-  let e2  := get_elem_bv st 2#4
-  let st' := set_elem_bv st' 2#4  (apply_sbox e2)
+  let e2  := get_elem st 2#4
+  let st' := set_elem st' 2#4  (apply_sbox e2)
   -- Element 3
-  let e3  := get_elem_bv st 3#4
-  let st' := set_elem_bv st' 3#4  (apply_sbox e3)
+  let e3  := get_elem st 3#4
+  let st' := set_elem st' 3#4  (apply_sbox e3)
   -- Element 4
-  let e4  := get_elem_bv st 4#4
-  let st' := set_elem_bv st' 4#4  (apply_sbox e4)
+  let e4  := get_elem st 4#4
+  let st' := set_elem st' 4#4  (apply_sbox e4)
   -- Element 5
-  let e5  := get_elem_bv st 5#4
-  let st' := set_elem_bv st' 5#4  (apply_sbox e5)
+  let e5  := get_elem st 5#4
+  let st' := set_elem st' 5#4  (apply_sbox e5)
   -- Element 6
-  let e6  := get_elem_bv st 6#4
-  let st' := set_elem_bv st' 6#4  (apply_sbox e6)
+  let e6  := get_elem st 6#4
+  let st' := set_elem st' 6#4  (apply_sbox e6)
   -- Element 7
-  let e7  := get_elem_bv st 7#4
-  let st' := set_elem_bv st' 7#4  (apply_sbox e7)
+  let e7  := get_elem st 7#4
+  let st' := set_elem st' 7#4  (apply_sbox e7)
   -- Element 8
-  let e8  := get_elem_bv st 8#4
-  let st' := set_elem_bv st' 8#4  (apply_sbox e8)
+  let e8  := get_elem st 8#4
+  let st' := set_elem st' 8#4  (apply_sbox e8)
   -- Element 9
-  let e9  := get_elem_bv st 9#4
-  let st' := set_elem_bv st' 9#4  (apply_sbox e9)
+  let e9  := get_elem st 9#4
+  let st' := set_elem st' 9#4  (apply_sbox e9)
   -- Element 10
-  let e10 := get_elem_bv st 10#4
-  let st' := set_elem_bv st' 10#4 (apply_sbox e10)
+  let e10 := get_elem st 10#4
+  let st' := set_elem st' 10#4 (apply_sbox e10)
   -- Element 11
-  let e11 := get_elem_bv st 11#4
-  let st' := set_elem_bv st' 11#4 (apply_sbox e11)
+  let e11 := get_elem st 11#4
+  let st' := set_elem st' 11#4 (apply_sbox e11)
   -- Element 12
-  let e12 := get_elem_bv st 12#4
-  let st' := set_elem_bv st' 12#4 (apply_sbox e12)
+  let e12 := get_elem st 12#4
+  let st' := set_elem st' 12#4 (apply_sbox e12)
   -- Element 13
-  let e13 := get_elem_bv st 13#4
-  let st' := set_elem_bv st' 13#4 (apply_sbox e13)
+  let e13 := get_elem st 13#4
+  let st' := set_elem st' 13#4 (apply_sbox e13)
   -- Element 14
-  let e14 := get_elem_bv st 14#4
-  let st' := set_elem_bv st' 14#4 (apply_sbox e14)
+  let e14 := get_elem st 14#4
+  let st' := set_elem st' 14#4 (apply_sbox e14)
   -- Element 15
-  let e15 := get_elem_bv st 15#4
-  let st' := set_elem_bv st' 15#4 (apply_sbox e15)
+  let e15 := get_elem st 15#4
+  let st' := set_elem st' 15#4 (apply_sbox e15)
   st'
 
 @[spec]
@@ -423,10 +423,10 @@ def sub_bytes_state (st : (RustArray u16 8)) : RustM (RustArray u16 8) := do
 
 def get_aes_st (st : Vector u16 8) : Vector (BitVec 8) 4 :=
   #v[
-    get_elem_bv st 15,
-    get_elem_bv st 14,
-    get_elem_bv st 13,
-    get_elem_bv st 12
+    get_elem st 15,
+    get_elem st 14,
+    get_elem st 13,
+    get_elem st 12
   ]
 
 #check aes_core.sub_bytes.get_elem_SBOX
@@ -438,16 +438,16 @@ set_option maxHeartbeats 10000000000000
 set_option maxRecDepth 100000
 theorem sub_bytes_correct_chunk (a0 a1 a2 a3 : BitVec 8) (st : RustArray u16 8) :
 ⦃ ⌜
-  a0 = get_elem_bv st.toVec 15#4 /\ a1 = get_elem_bv st.toVec 14#4 /\
-  a2 = get_elem_bv st.toVec 13#4 /\ a3 = get_elem_bv st.toVec 12#4
+  a0 = get_elem st.toVec 15#4 /\ a1 = get_elem st.toVec 14#4 /\
+  a2 = get_elem st.toVec 13#4 /\ a3 = get_elem st.toVec 12#4
 ⌝ ⦄
 aes_core.sub_bytes.sub_bytes_state st
 ⦃ ⇓ ⟨res_output⟩ =>
     ⌜
-    aes_core.sub_bytes.get_elem_SBOX (a0.extractLsb 7 4) (a0.extractLsb 3 0) = get_elem_bv res_output 15#4 /\
-    aes_core.sub_bytes.get_elem_SBOX (a1.extractLsb 7 4) (a1.extractLsb 3 0) = get_elem_bv res_output 14#4 /\
-    aes_core.sub_bytes.get_elem_SBOX (a2.extractLsb 7 4) (a2.extractLsb 3 0) = get_elem_bv res_output 13#4 /\
-    aes_core.sub_bytes.get_elem_SBOX (a3.extractLsb 7 4) (a3.extractLsb 3 0) = get_elem_bv res_output 12#4
+    aes_core.sub_bytes.get_elem_SBOX (a0.extractLsb 7 4) (a0.extractLsb 3 0) = get_elem res_output 15#4 /\
+    aes_core.sub_bytes.get_elem_SBOX (a1.extractLsb 7 4) (a1.extractLsb 3 0) = get_elem res_output 14#4 /\
+    aes_core.sub_bytes.get_elem_SBOX (a2.extractLsb 7 4) (a2.extractLsb 3 0) = get_elem res_output 13#4 /\
+    aes_core.sub_bytes.get_elem_SBOX (a3.extractLsb 7 4) (a3.extractLsb 3 0) = get_elem res_output 12#4
 ⌝ ⦄
 := by
 
@@ -458,7 +458,7 @@ aes_core.sub_bytes.sub_bytes_state st
 
     simp only [var_0]
     refine ⟨?_, ?_, ?_, ?_⟩ <;>
-    simp only [get_elem_bv, aes_core.sub_bytes.get_elem_SBOX] <;>
+    simp only [get_elem, aes_core.sub_bytes.get_elem_SBOX] <;>
     simp only [Nat.reduceAdd, Nat.sub_zero, beq_iff_eq, BitVec.ushiftRight_eq', BitVec.zero_or,
       ne_eq, reduceCtorEq, not_false_eq_true, Vector.getElem_set_ne, Nat.succ_ne_self,
       Vector.getElem_set_self, UInt16.toBitVec_not, UInt16.toBitVec_xor, UInt16.toBitVec_and,

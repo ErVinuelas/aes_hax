@@ -8,6 +8,7 @@ import Std.Tactic.Do.Syntax
 import sub_bytes
 import key_expansion_step
 import Utilities
+
 open Std.Do
 open Std.Tactic
 
@@ -158,7 +159,7 @@ theorem aes_keygen_assist_correct (next : (RustArray u16 8)) (prev : (RustArray 
       refine ⟨?_, ?_⟩ <;>
       refine ⟨?_, ?_, ?_, ?_⟩ <;>
         simp only [var_1] <;>
-        unfold get_elem_bv <;>
+        unfold get_elem <;>
         simp only [Nat.sub_zero, Nat.reduceAdd, BitVec.truncate_eq_setWidth, Nat.reduceLeDiff,
           Nat.reducePow, Nat.lt_add_one, BitVec.setWidth_ofNat_of_le_of_lt, BitVec.ushiftRight_eq',
           BitVec.toNat_ofNat, Nat.reduceMod, BitVec.zero_or, ne_eq, reduceCtorEq, not_false_eq_true,
@@ -249,7 +250,7 @@ by
       simp
       refine ⟨?_, ?_, ?_, ?_⟩ <;>
       refine ⟨?_, ?_, ?_, ?_⟩ <;>
-      unfold get_elem_bv <;>
+      unfold get_elem <;>
       simp <;>
       simp only [<- var_19, <- var_22, <- var_25, <- var_28, <- var_31,
         <- var_34, <- var_37, <- var_40] <;>
@@ -334,7 +335,7 @@ by
       simp
       refine ⟨?_, ?_, ?_, ?_⟩ <;>
       refine ⟨?_, ?_, ?_, ?_⟩ <;>
-      unfold get_elem_bv <;>
+      unfold get_elem <;>
       simp <;>
       simp only [<- var_19, <- var_22, <- var_25, <- var_28, <- var_31,
         <- var_34, <- var_37, <- var_40] <;>

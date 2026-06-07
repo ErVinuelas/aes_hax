@@ -5,14 +5,10 @@ import Hax
 import Std.Tactic.Do
 import Std.Do.Triple
 import Std.Tactic.Do.Syntax
-import transpose_u16x8
-import transpose_u8x16
-import sub_bytes
-import shift_rows_state
-import LibcruxAesgcm
 
-import mix_columns
-import xor_key1_state
+import transpose_u8x16
+import cipher_theorems
+
 
 import aes_keygen_assist
 import key_expansion_step
@@ -1097,7 +1093,7 @@ def key_expansion_small
 def key_expansion_spec (i : Nat) (hi : i < 11) (key : RustSlice u8) (h : key.val.size = 16) :=
   let rcon_vec : Vector u8 11 := #v[0, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1b, 0x36]
   if i = 0 then
-    let fst := (aes_core.transpose_u8x16.transposeU8toU16 (RustArray.ofVec (@Vector.mk u8 16 key.val h))).toVec
+    let fst := (aes_core.transpose_u8x16.transposeU8toU16 (RustArray.ofVec (@Vector.mk u8 16 key.val h)))
     #v[get_word fst 3, get_word fst 2, get_word fst 1, get_word fst 0]
   else
     let prev := key_expansion_spec (i - 1) (by grind) key h
