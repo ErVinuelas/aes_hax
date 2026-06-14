@@ -97,7 +97,7 @@ def key_expansion_step (next : (RustArray u16 8)) (prev : (RustArray u16 8)) :
 
 set_option maxHeartbeats 10000000000000
 set_option maxRecDepth 100000
-theorem key_expansion_correct2 (next : (RustArray u16 8)) (prev : (RustArray u16 8)) :
+theorem key_expansion_correct (next : (RustArray u16 8)) (prev : (RustArray u16 8)) :
 ⦃ ⌜ true ⌝ ⦄
   key_expansion_step next prev
 ⦃ ⇓ ⟨res⟩ =>

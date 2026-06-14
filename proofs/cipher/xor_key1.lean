@@ -14,7 +14,7 @@ set_option mvcgen.warning false
 set_option linter.unusedVariables false
 
 
-namespace aes_core.xor_key1_state
+namespace aes_core.xor_key1
 
 def xor_key1_state_spec (st : (Vector u16 8)) (k : (Vector u16 8)) : (Vector u16 8) :=
   (Vector.zip st k).map (fun (x, y) => x ^^^ y)
@@ -65,4 +65,4 @@ def xor_key1_state (st : (RustArray u16 8)) (k : (RustArray u16 8)) :
   (pure st)
 
 
-end aes_core.xor_key1_state
+end aes_core.xor_key1

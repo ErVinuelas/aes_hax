@@ -5,8 +5,8 @@ import Std.Tactic.Do.Syntax
 import Utilities
 import transpose_u16x8
 import transpose_u8x16
-import shift_rows_state
-import xor_key1_state
+import shift_rows
+import xor_key1
 import sub_bytes
 import mix_columns
 
@@ -104,11 +104,11 @@ set_option hax_mvcgen.specset "bv" in
 @[spec]
 theorem shift_rows_state_correct (st : (RustArray u16 8)) :
 ⦃ ⌜ true = true ⌝ ⦄
-aes_core.shift_row_state.shift_rows_state st
+aes_core.shift_rows.shift_rows_state st
 ⦃ ⇓ ⟨res⟩ =>
-    ⌜ res = (aes_core.shift_row_state.shift_rows_stat_spec st) ⌝ ⦄
+    ⌜ res = (aes_core.shift_rows.shift_rows_stat_spec st) ⌝ ⦄
 := by
-    unfold aes_core.shift_row_state.shift_rows_state
+    unfold aes_core.shift_rows.shift_rows_state
 
     hax_mvcgen
     <;> simp at *
@@ -117,11 +117,11 @@ aes_core.shift_row_state.shift_rows_state st
       match i with
       | n + 8 => intros; omega
       | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 =>
-        simp only [aes_core.shift_row_state.shift_rows_stat_spec] at *
+        simp only [aes_core.shift_rows.shift_rows_stat_spec] at *
         rename_auto_n 41
         simp only [Vector.getElem_map]
         simp only [var_40, var_38, var_36, var_34, var_32, var_30, var_28, var_26]
-        simp only [aes_core.shift_row_state.shift_row_u16_spec]
+        simp only [aes_core.shift_rows.shift_row_u16_spec]
         simp
         simp only [<- var_39, <- var_37, <- var_35, <- var_33, <- var_31, <- var_29, <- var_27, <- var_25]
     all_goals grind
@@ -129,18 +129,18 @@ aes_core.shift_row_state.shift_rows_state st
 set_option maxHeartbeats 100000000
 set_option hax_mvcgen.specset "bv" in
 @[spec]
-theorem xor_key1_state_correct (st : (RustArray u16 8))(k : (RustArray u16 8)) :
+theorem xor_key1_correct (st : (RustArray u16 8))(k : (RustArray u16 8)) :
 ⦃ ⌜ true = true ⌝ ⦄
-aes_core.xor_key1_state.xor_key1_state st k
+aes_core.xor_key1.xor_key1_state st k
 ⦃ ⇓ ⟨res⟩ =>
-    ⌜ res = (aes_core.xor_key1_state.xor_key1_state_spec st.toVec k.toVec) ⌝ ⦄
+    ⌜ res = (aes_core.xor_key1.xor_key1_state_spec st.toVec k.toVec) ⌝ ⦄
 := by
-    unfold aes_core.xor_key1_state.xor_key1_state
+    unfold aes_core.xor_key1.xor_key1_state
 
     hax_mvcgen
     <;> simp at *
     .
-      unfold aes_core.xor_key1_state.xor_key1_state_spec
+      unfold aes_core.xor_key1.xor_key1_state_spec
       simp
       rename_auto_n 41
       ext i

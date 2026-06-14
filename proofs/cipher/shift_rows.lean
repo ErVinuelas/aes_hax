@@ -14,14 +14,14 @@ set_option mvcgen.warning false
 set_option linter.unusedVariables false
 
 
-namespace aes_core.shift_row_state
+namespace aes_core.shift_rows
 
 def fst_row := [0, 4, 8, 12]
 def snd_row := [1, 5, 9, 13]
 def thrd_row := [2, 6, 10, 14]
 def frth_row := [3, 7, 11, 15]
 
---For each map of bits we are moving the lements a number of positions depending
+--For each map of bits we are moving the elements a number of positions depending
 -- on the row they are in the matrix.
 def shift_row_u16_spec (input : u16) : u16 :=
   let input_bitvec := input.toBitVec
@@ -116,4 +116,4 @@ shift_row_u16 input
       clear h1 h2 h3 h4 h5 h6 h7
       bv_decide
 
-end aes_core.shift_row_state
+end aes_core.shift_rows

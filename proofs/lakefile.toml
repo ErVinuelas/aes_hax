@@ -11,14 +11,15 @@ globs = ["Utilities"]
 name = "Cipher"
 srcDir = "cipher"
 globs = ["Cipher", "transpose_u16x8", "transpose_u8x16", "sub_bytes",
-         "shift_rows_state", "xor_key1_state", "mix_columns",
+         "shift_rows", "xor_key1", "mix_columns",
          "gf8", "cipher_theorems"]
 needs = ["Utilities"]
 
 [[lean_lib]]
 name = "KeyExpansion"
 srcDir = "key_expansion"
-globs = [ "KeyExpansion", "key_expansion_step", "aes_keygen_assist", "key_expansion"]
+globs = [ "KeyExpansion", "key_expansion_step", "aes_keygen_assist", 
+          "key_expansion_128", "key_expansion_256"]
 needs = ["Utilities", "Cipher"]
 
 [[lean_lib]]
