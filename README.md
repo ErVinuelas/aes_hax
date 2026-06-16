@@ -1,8 +1,5 @@
 # Verifying Libcrux AES using Hax + Lean
  
-Master's Thesis — Pablo Martin (202402620), Aarhus University, June 2026
-Advisor: Bas Spitters
- 
 ## Overview
  
 This project formally verifies the portable AES-128 and AES-256 block cipher implementations from [libcrux](https://github.com/cryspen/libcrux), a high-assurance Rust cryptographic library. It uses the combination of **Hax** and **Lean** to bridge the gap between a Rust implementation and its mathematical specification.
