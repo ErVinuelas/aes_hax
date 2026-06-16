@@ -1,26 +1,35 @@
-This repo serves as a summary of what I have been able to prove so far. The main file, `LibcruxAesgcm.lean`, contains the main proofs. This proofs relate a specification in Lean to the translation done by hax of the corresponding function of libcrux.
-All functions done so far belong to [`aes_core.rs`](https://github.com/cryspen/libcrux/blob/main/crates/algorithms/aesgcm/src/platform/portable/aes_core.rs).
-
-__Addition to Hax:__
-
-When I started working with `RustSlice` there wasn't a function to update the value of a certain slice. I needed such a function to be able to reason around `transpose_u16x8_correct`. 
-Add the following to the file `Hax/proof-libs/lean/Hax/rust_primitives/slice.lean`. 
-
+# Verifying Libcrux AES using Hax + Lean
+ 
+Master's Thesis — Pablo Martin (202402620), Aarhus University, June 2026
+Advisor: Bas Spitters
+ 
+## Overview
+ 
+This project formally verifies the portable AES-128 and AES-256 block cipher implementations from [libcrux](https://github.com/cryspen/libcrux), a high-assurance Rust cryptographic library. It uses the combination of **Hax** and **Lean** to bridge the gap between a Rust implementation and its mathematical specification.
+ 
+## Tools
+ 
+- **[Hax](https://github.com/hacspec/hax)** — extracts a Lean model from Rust source code, encoding Rust's panic/divergence behaviour via a `RustM` monad.
+- **[Lean 4](https://leanprover.github.io/)** — interactive theorem prover used to write the AES specification and prove correctness theorems, making use of `mvcgen` (monadic verification condition generator) and `bv_decide` (SAT-backed bitvector tactic).
+## What is verified
+ 
+All core functions of the AES block cipher are verified against a readable mathematical specification:
+ 
+- `transpose_u16x8` / `transpose_u8x16` — bitsliced state representation transforms
+- `sub_bytes_state` — SubBytes step via SBox lookup
+- `shift_rows_state` — ShiftRows cyclic rotation
+- `mix_columns_state` — MixColumns matrix multiplication in GF(2⁸)
+- `xor_key1_state` — AddRoundKey XOR
+- `key_expansion_step` — full AES-128 and AES-256 key schedule
+## Repository structure
+ 
 ```
-@[spec]
-def rust_primitives.slice.update_at {α} (s : RustSlice α) (i : usize) (v : α) : RustM (RustSlice α) :=
-  if h : (USize64.toNat i) < s.val.size then
-    pure ⟨(s.val.set (USize64.toNat i) v h), by grind⟩
-  else
-    .fail (.arrayOutOfBounds)
+.
+├── src/           # Rust source (libcrux AES portable implementation)
+├── proofs/        # Lean specifications and correctness theorems
+│   ├── GF8.lean           # GF(2⁸) field arithmetic
+│   ├── State.lean         # AES state representation and helpers
+│   ├── Encryption.lean    # SubBytes, ShiftRows, MixColumns, AddRoundKey
+│   └── KeyExpansion.lean  # Key schedule
+└── README.md
 ```
-
-__About what is already proved:__
-
-Both the specification and the translated function done by hax are defined in a separate file called as the function. This file usually also contains auxiliary functions that I needed to relate to a specification so I could reason about the main one. Fx,
-the function `transpose_u8x16` is related to the specification `transpose_u16x8` by the lemma `transpose_u16x8_correct`, where the lemma is defined in `LibcruxAesgcm.lean` and the rest is defined in the file `transpose_u16x8.lean`.
-
-__About what is left to prove:__
-
-What it is left to be proven from AES is the key generation. I am working on it. Besides that, it would be important to reason around the GCM side of things, but I am not entirely sure
-that the specification I can make is clearer that the code itself.
