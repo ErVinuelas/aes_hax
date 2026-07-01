@@ -3,6 +3,8 @@
 ## Overview
  
 This project formally verifies functional correctness of the portable AES-128 and AES-256 block cipher implementations from [libcrux](https://github.com/cryspen/libcrux), a high-assurance Rust cryptographic library. It uses the combination of **Hax** and **Lean** to bridge the gap between a Rust implementation and its mathematical specification.
+
+This repo contains the proofs related to the project and the extracted functions from the original code.
  
 ## Tools
  
